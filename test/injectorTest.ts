@@ -55,6 +55,23 @@ class PureAbstractClassImplementation implements PureAbstractClass {
     }
 }
 
+class MyObject {
+    public MyValue: string;
+}
+
+abstract class ObjectWithNumValue {
+    public abstract MyValue: number;
+}
+
+class MyTransientObject implements ObjectWithNumValue {
+    static Counter = 0;
+    public MyValue: number;
+
+    constructor() {
+        this.MyValue = MyTransientObject.Counter++;
+    }
+}
+
 describe("Injector", () => {
     beforeEach(() => {
         container = new Container();
@@ -97,5 +114,39 @@ describe("Injector", () => {
         expect(() => x = resolve(PureAbstractClass)).toThrow(new Error("Cannot resolve type PureAbstractClass."));
 
         expect(x).toBe(undefined);
+    })
+
+    it("should register and resolve values (string keying)", () => {
+        container.registerValue("my number", 5);
+
+        const x = resolve<number>("my number");
+
+        expect(x).toBe(5);
+    })
+
+    it("should register and resolve values (type keying)", () => {
+        container.registerValue(MyObject, { MyValue: "value" });
+
+        const x = resolve(MyObject);
+
+        expect(x.MyValue).toBe("value");
+    })
+
+    it("should register and resolve transient types", () => {
+        container.register(ObjectWithNumValue, MyTransientObject, "transient");
+
+        const x = resolve(ObjectWithNumValue);
+        const y = resolve(ObjectWithNumValue);
+
+        expect(x.MyValue).not.toBe(y.MyValue);
+    })
+
+    it("should register and resolve permanent types", () => {
+        container.register(ObjectWithNumValue, MyTransientObject, "permanent");
+
+        const x = resolve(ObjectWithNumValue);
+        const y = resolve(ObjectWithNumValue);
+
+        expect(x.MyValue).toBe(y.MyValue);
     })
 })
