@@ -4,6 +4,15 @@
   "description": "Simple TypeScript Dependency Injection Usable with React Components",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BoosterOfOld/ts-simple-dependency-injector.git"
+  },
+  "keywords": [
+    "dependency",
+    "injection",
+    "container"
+  ],
   "scripts": {
     "all": "npm-run-all build build-test test",
     "build": "tsc -p tsconfig.json",
