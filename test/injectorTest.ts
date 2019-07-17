@@ -1,5 +1,5 @@
 import "jasmine";
-import { Container } from "../src/injector";
+import { Container } from "../src";
 
 let container: Container;
 let resolve: typeof container.resolve;

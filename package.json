@@ -1,6 +1,6 @@
 {
   "name": "ts-simple-dependency-injector",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Simple TypeScript Dependency Injection Usable with React Components",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,6 +20,9 @@
     "prepublish": "npm-run-all all",
     "test": "jasmine JASMINE_CONFIG_PATH=jasmine.json"
   },
+  "files": [
+    "dist"
+  ],
   "author": "BoosterOfOld",
   "license": "MIT",
   "devDependencies": {
