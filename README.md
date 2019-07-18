@@ -128,6 +128,35 @@ There are two registration scopes -- "permanent" and "transient". The permanent 
 
     expect(x.MyValue).not.toBe(y.MyValue);
 
+## Implicitly typed Constructor Parameters
+If you need to provide constructor parameters when registering a type, you can do so using the third parameter of the "register" function, which implicitly infers the type from the provided implementation, so you can never mistakenly provide incorrect parameters.
+
+    abstract class IMyTuple {
+        public abstract C5: Class5;
+        public abstract get Tuple(): [string, number];
+    }
+
+    class MyTuple implements IMyTuple {
+        constructor(
+            private String: string,
+            private Number: number,
+            public C5 = resolve(Class5),
+        ) { }
+
+        public get Tuple(): [string, number] {
+            return [this.String, this.Number];
+        }
+    }
+
+    container.register(Class5, Class5, "permanent");
+    container.register(IMyTuple, MyTuple, "permanent", ["Str", 6]);
+
+    const x = resolve(IMyTuple);
+
+    expect(x.Tuple[0]).toBe("Str");
+    expect(x.Tuple[1]).toBe(6);
+    expect(x.C5.Field).toBe("5");
+
 ## Simple Mocking and Testing
 Leveraging default parameters in the constructor makes it very easy to shut off the injection mechanism in tests and simply provide the constructor with your own mock implementation.
 

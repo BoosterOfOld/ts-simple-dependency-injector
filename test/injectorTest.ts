@@ -63,6 +63,23 @@ abstract class ObjectWithNumValue {
     public abstract MyValue: number;
 }
 
+abstract class IMyTuple {
+    public abstract Cc5: CascadingClass5;
+    public abstract get Tuple(): [string, number];
+}
+
+class MyTuple implements IMyTuple {
+    constructor(
+        private String: string,
+        private Number: number,
+        public Cc5 = resolve(CascadingClass5),
+    ) { }
+
+    public get Tuple(): [string, number] {
+        return [this.String, this.Number];
+    }
+}
+
 class MyTransientObject implements ObjectWithNumValue {
     static Counter = 0;
     public MyValue: number;
@@ -148,5 +165,30 @@ describe("Injector", () => {
         const y = resolve(ObjectWithNumValue);
 
         expect(x.MyValue).toBe(y.MyValue);
+    })
+
+    it("should register and resolve with constructor parameters (permanent)", () => {
+        container.register(CascadingClass5, CascadingClass5, "permanent");
+
+        // The type of the third parameter here is [string, number, Class5?].
+        // Class5 is resolved from the container.
+        container.register(IMyTuple, MyTuple, "permanent", ["Str", 6]);
+
+        const x = resolve(IMyTuple);
+
+        expect(x.Tuple[0]).toBe("Str");
+        expect(x.Tuple[1]).toBe(6);
+        expect(x.Cc5.Field).toBe("5");
+    })
+
+    it("should register and resolve with constructor parameters (transient)", () => {
+        container.register(CascadingClass5, CascadingClass5, "transient");
+        container.register(IMyTuple, MyTuple, "transient", ["Str", 6]);
+
+        const x = resolve(IMyTuple);
+
+        expect(x.Tuple[0]).toBe("Str");
+        expect(x.Tuple[1]).toBe(6);
+        expect(x.Cc5.Field).toBe("5");
     })
 })

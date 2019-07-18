@@ -1,25 +1,30 @@
-interface Instantiable<T> { new(...args: any[]): T; }
+interface Instantiable<T, P extends Array<any>> { new(...args: P): T; }
 type Abstract<T> = Function & { prototype: T };
-type Class<T> = Instantiable<T> | Abstract<T>;
+type Class<T> = Instantiable<T, any> | Abstract<T>;
 
 export type LifetimeScope = "permanent" | "transient";
 
 interface Resolvable<T> {
-    implementation?: Instantiable<T>;
+    implementation?: Instantiable<T, any>;
     lifetimeScope: LifetimeScope;
-    identifier?: string,
+    constructorParameters?: any[] | undefined;
 }
 
 export class Container {
     private readonly resolvables = new Map<string | Class<any>, Resolvable<any>>();
     private readonly values = new Map<string | Class<any>, any>();
 
-    public register<T>(
+    public register<T, P extends Array<any>>(
         type: Class<T> | string,
-        implementedBy: Instantiable<T>,
-        lifetimeScope: LifetimeScope
+        implementedBy: Instantiable<T, P>,
+        lifetimeScope: LifetimeScope,
+        constructorParameters?: P,
     ) {
-        const resolvable: Resolvable<T> = { implementation: implementedBy, lifetimeScope };
+        const resolvable: Resolvable<T> = {
+            implementation: implementedBy,
+            lifetimeScope,
+            constructorParameters,
+        };
         this.resolvables.set(type, resolvable);
 
         if (lifetimeScope === "permanent") {
@@ -62,7 +67,7 @@ export class Container {
     private resolveTransient<T>(
         resolvable: Resolvable<T>
     ): T {
-        return new (resolvable.implementation!)();
+        return new (resolvable.implementation!)(...(resolvable.constructorParameters || []));
     }
 
     private resolvePermanent<T>(
